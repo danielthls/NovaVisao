@@ -1257,7 +1257,6 @@ object frmEnviar: TfrmEnviar
       end
     end
     object rectExibirImagens: TRectangle
-      Enabled = False
       Fill.Color = xFFCA9E67
       Position.X = 168.000000000000000000
       Position.Y = 421.000000000000000000
@@ -1265,7 +1264,6 @@ object frmEnviar: TfrmEnviar
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       Stroke.Kind = None
-      Visible = False
       OnClick = rectExibirImagensClick
       object Label6: TLabel
         Align = Center
