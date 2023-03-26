@@ -2,7 +2,7 @@ unit UUtils.Close;
 
 interface
 
-class procedure FecharAbas;
+//class procedure FecharAbas;
 
 implementation
 
