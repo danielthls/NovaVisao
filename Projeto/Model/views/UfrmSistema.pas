@@ -123,7 +123,7 @@ begin
         ShowMessage('Nenhum registro encontrado!');
         Result := False
     finally
-   //   FreeAndNil(xCliente);
+  //    FreeAndNil(xCliente);
     end;
   finally
     FreeAndNil(xDaoCliente);
