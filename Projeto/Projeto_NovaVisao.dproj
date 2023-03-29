@@ -193,7 +193,6 @@
         <DCCReference Include="Model\Entities\uEntity.Cliente.pas"/>
         <DCCReference Include="Model\service\UDM.pas">
             <Form>DM</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="Model\service\UService.ChatGPT.pas"/>
@@ -206,23 +205,18 @@
         <DCCReference Include="Model\Utils\UUtils.Notificacao.pas"/>
         <DCCReference Include="Model\views\UfrmCadastrar.pas">
             <Form>frmCadastrar</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="Model\views\UfrmEnviar.pas">
             <Form>frmEnviar</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="Model\views\UfrmHome.pas">
             <Form>frmHome</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="Model\views\UfrmImagens.pas">
             <Form>frmImagens</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="Model\views\UfrmSistema.pas">
             <Form>frmSistema</Form>
-            <FormType>fmx</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

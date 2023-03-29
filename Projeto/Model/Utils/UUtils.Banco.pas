@@ -16,14 +16,15 @@ uses
 
 type
   TUtilBanco = class
-    private
-      class var FConexao: TFDConnection;
-      class procedure AbrirConexao;
-      class procedure FecharConexao;
-    public
-
-      class function PesquisarRegistroCliente({const aCodCliente: Integer;} aNomCliente: String): TCliente;
-      class function AdicionarRegistroCliente(const aClasseCliente: TCliente): Boolean;
+  private
+    class var FConexao: TFDConnection;
+    class var FDriver: TFDPhysMySQLDriverLink;
+    class procedure AbrirConexao;
+    class procedure FecharConexao;
+  public
+    class function ExecutarConsulta(const aSQL: String): TFDQuery;
+    class function PesquisarRegistroCliente({const aCodCliente: Integer;} aNomCliente: String): TCliente;
+    class function AdicionarRegistroCliente(const aClasseCliente: TCliente): Boolean;
   end;
 
 implementation
@@ -32,13 +33,11 @@ implementation
 
 
 class procedure TUtilBanco.AbrirConexao;
-var
-  xDriver: TFDPhysMySQLDriverLink;
 begin
-  xDriver := TFDPhysMySQLDriverLink.Create(nil);
+  FDriver := TFDPhysMySQLDriverLink.Create(nil);
   FConexao  := TFDConnection.Create(nil);
   //Driver de Conexão do MySQL
-  xDriver.VendorLib := ExtractFilePath(ParamStr(0)) + 'libmysql.dll';
+  FDriver.VendorLib := ExtractFilePath(ParamStr(0)) + 'libmysql.dll';
   //Parâmetros de Configuração do banco
   FConexao.DriverName  := 'MySQL';
   FConexao.LoginPrompt := False;
@@ -87,6 +86,30 @@ begin
   end;
 end;
 
+
+class function TUtilBanco.ExecutarConsulta(const aSQL: String): TFDQuery;
+var
+  xQuery: TFDQuery;
+begin
+  xQuery := TFDQuery.Create(nil);
+  try
+    try
+      Self.AbrirConexao;
+      xQuery.Connection := FConexao;
+      xQuery.Open(aSQL);
+
+      Result := xQuery;
+
+    except
+      on e: Exception do
+        raise Exception.Create(e.Message);
+    end;
+  finally
+    Self.FecharConexao;
+    //FreeAndNil(xQuery);
+  end;
+
+end;
 
 class function TUtilBanco.PesquisarRegistroCliente({const aCodCliente: Integer;} aNomCliente: String): TCliente;
 var
@@ -141,6 +164,7 @@ begin
   begin
     FConexao.Close;
     FreeAndNil(FConexao);
+    FreeAndNil(FDriver);
   end;
 end;
 end.

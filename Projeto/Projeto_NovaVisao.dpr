@@ -1,6 +1,7 @@
 program Projeto_NovaVisao;
 
 uses
+  FastMM4, FastMM4Messages,
   System.StartUpCopy,
   FMX.Forms,
   UDao.Cliente in 'Model\Dao\UDao.Cliente.pas',
@@ -23,7 +24,7 @@ uses
 {$R *.res}
 
 begin
-  ReportMemoryLeaksOnShutdown := True;
+  //ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TfrmHome, frmHome);
