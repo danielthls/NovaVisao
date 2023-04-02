@@ -44,17 +44,24 @@ end;
 
 {Solicitar notificação}
 procedure TNotificacao.SolicitarNotificacao(aTipoNotificacao: OpEnumEnviar);
+var
+  xNotificacaoEmail: TNotificacaoEmail;
 begin
+  xNotificacaoEmail := TNotificacaoEmail.Create;
+  try
   case OpEnumEnviar(aTipoNotificacao) of
     opEnviarPorApp:
       TNotificacaoApp.EnviarNotificacao(Self.FCliente.Telefone, Self.FUrlImagem);
     opEnviarPorEmail :
-      TNotificacaoEmail.EnviarNotificacao(Self.FCliente.Email, Self.FUrlImagem);
+      xNotificacaoEmail.EnviarNotificacao(Self.FCliente.Email, Self.FUrlImagem);
     opEnviarAmbos :
     begin
-      TNotificacaoEmail.EnviarNotificacao(Self.FCliente.Email, Self.FUrlImagem);;
+      xNotificacaoEmail.EnviarNotificacao(Self.FCliente.Email, Self.FUrlImagem);;
       TNotificacaoApp.EnviarNotificacao(Self.FCliente.Telefone, Self.FUrlImagem);
     end;
+  end;
+  finally
+    FreeAndNil(xNotificacaoEmail);
   end;
 end;
 
