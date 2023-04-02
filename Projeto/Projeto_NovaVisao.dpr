@@ -1,7 +1,8 @@
 program Projeto_NovaVisao;
 
 uses
-  FastMM4, FastMM4Messages,
+  FastMM4,
+  FastMM4Messages,
   System.StartUpCopy,
   FMX.Forms,
   UDao.Cliente in 'Model\Dao\UDao.Cliente.pas',
@@ -19,7 +20,8 @@ uses
   UfrmEnviar in 'Model\views\UfrmEnviar.pas' {frmEnviar},
   UfrmHome in 'Model\views\UfrmHome.pas' {frmHome},
   UfrmImagens in 'Model\views\UfrmImagens.pas' {frmImagens},
-  UfrmSistema in 'Model\views\UfrmSistema.pas' {frmSistema};
+  UfrmSistema in 'Model\views\UfrmSistema.pas' {frmSistema},
+  UEntity.Email in 'Model\Entities\UEntity.Email.pas';
 
 {$R *.res}
 

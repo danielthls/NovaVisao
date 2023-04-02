@@ -4,26 +4,89 @@ interface
 
 uses
   Fmx.Dialogs, System.SysUtils, System.Classes,
-  UUtils.Consts,
+  UUtils.Consts, IniFiles,
   IdSMTP,
   IdMessage,
   IdSSLOpenSSL,
-  IdExplicitTLSClientServerBase;
+  IdExplicitTLSClientServerBase,
+  UEntity.Email,
+  System.IOUtils;
 
 type
   TNotificacaoEmail = class
-    private
+  private
+    FContaEmail: TContaEmail;
+    procedure CarregarConfig;
+    function ValidarConfig: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure EnviarNotificacao(aEmailCliente: String;
+      aUrlImagem: TStringList);
+    procedure CriarConfig(aEmail, aSenha, aSMTP: String; aPorta: Integer);
 
-    public
-      class procedure EnviarNotificacao(aEmailCliente: String;
-        aUrlImagem: TStringList);
   end;
 
 implementation
 
 { TNotificacaoEmail }
 
-class procedure TNotificacaoEmail.EnviarNotificacao(
+procedure TNotificacaoEmail.CarregarConfig;
+var
+  xArquivoIni: TIniFile;
+  xCaminhoArquivo: string;
+  xSenha: String;
+begin
+  xCaminhoArquivo := ExpandFileName(ARQUIVO_INI);
+  xArquivoIni := TIniFile.Create(xCaminhoArquivo);
+  try
+    FContaEmail.Email := xArquivoIni.ReadString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_EMAIL, '');
+    //xSenha := xArquivoIni.ReadString('ContaEmail', 'Senha', '');
+    FContaEmail.Senha := xArquivoIni.ReadString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_SENHA, '');
+    FContaEmail.Porta := xArquivoIni.ReadString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_PORTA, '').ToInteger;
+    FContaEmail.SMTP  := xArquivoIni.ReadString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_SMTP , '');
+    //FSenha := TBcrypt.
+  finally
+    FreeAndNil(xArquivoIni);
+  end;
+
+end;
+
+constructor TNotificacaoEmail.Create;
+begin
+  FContaEmail := TContaEmail.Create;
+  if ValidarConfig then
+    CarregarConfig;
+
+end;
+
+procedure TNotificacaoEmail.CriarConfig(aEmail, aSenha, aSMTP: String; aPorta: Integer);
+var
+  xEmailConfig: TIniFile;
+  xCaminhoArquivo: String;
+begin
+  xCaminhoArquivo := ExpandFileName(ARQUIVO_INI);
+  TFile.Create(xCaminhoArquivo);
+  xEmailConfig := TIniFile.Create(xCaminhoArquivo);
+  try
+    xEmailConfig.WriteString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_EMAIL, aEmail);
+    xEmailConfig.WriteString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_SENHA, aSenha);
+    xEmailConfig.WriteInteger(SECAO_INI_CONTA_EMAIL, CHAVE_INI_PORTA, aPorta);
+    xEmailConfig.WriteString(SECAO_INI_CONTA_EMAIL, CHAVE_INI_SMTP, aSMTP);
+    xEmailConfig.UpdateFile;
+    CarregarConfig;
+  finally
+    FreeAndNil(xEmailConfig);
+  end;
+end;
+
+destructor TNotificacaoEmail.Destroy;
+begin
+  FreeAndNil(FContaEmail);
+  inherited;
+end;
+
+procedure TNotificacaoEmail.EnviarNotificacao(
   aEmailCliente: String; aUrlImagem: TStringList);
 var
   xSMTP: TIdSMTP;
@@ -38,14 +101,14 @@ begin
   try
     xSocketSSL.SSLOptions.Mode := sslmClient;
     xSocketSSL.SSLOptions.Method := sslvTLSv1_2;
-    xSocketSSL.Host := SMTP;
-    xSocketSSL.Port := PORTA;
+    xSocketSSL.Host := FContaEmail.SMTP;
+    xSocketSSL.Port := FContaEmail.Porta;
     xSMTP.IOHandler := xSocketSSL;
-    xSMTP.Host := SMTP;
-    xSMTP.Port := PORTA;
+    xSMTP.Host := FContaEmail.SMTP;
+    xSMTP.Port := FContaEmail.Porta;
     xSMTP.AuthType := satDefault;
-    xSMTP.Username := EMAIL;
-    xSMTP.Password := PASSWORD;
+    xSMTP.Username := FContaEmail.Email;
+    xSMTP.Password := FContaEmail.Senha;
     xSMTP.UseTLS := utUseExplicitTLS;
     xMessage.From.Address := aEmailCliente;                       //destinatario
     xMessage.Recipients.Add;
@@ -68,6 +131,38 @@ begin
     FreeAndNil(xSMTP);
     FreeAndNil(xMessage);
     FreeAndNil(xSocketSSL);
+  end;
+end;
+
+function TNotificacaoEmail.ValidarConfig: Boolean;
+var
+  xArquivoIni: TInifile;
+  xCaminhoArquivo: string;
+begin
+  xCaminhoArquivo := ExpandFileName(ARQUIVO_INI);
+  if not FileExists(xCaminhoArquivo) then
+  begin
+    Result := False;
+    Exit;
+  end
+  else
+  begin
+    xArquivoIni := TInifile.Create(xCaminhoArquivo);
+    try
+      xArquivoIni.UpdateFile;
+      if (not xArquivoIni.SectionExists(SECAO_INI_CONTA_EMAIL) or not
+        (xArquivoIni.ValueExists(SECAO_INI_CONTA_EMAIL, CHAVE_INI_EMAIL) and
+        xArquivoIni.ValueExists( SECAO_INI_CONTA_EMAIL, CHAVE_INI_SENHA) and
+        xArquivoIni.ValueExists( SECAO_INI_CONTA_EMAIL, CHAVE_INI_PORTA) and
+        xArquivoIni.ValueExists( SECAO_INI_CONTA_EMAIL, CHAVE_INI_SMTP ))) then
+      begin
+        Result := false;
+      end
+      else
+      Result := true;
+    finally
+      FreeAndNil(xArquivoIni);
+    end;
   end;
 end;
 
