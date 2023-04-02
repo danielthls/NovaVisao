@@ -8,7 +8,9 @@ Lista de afazeres (sujeito a alterações):
 
 2 - Refatorar o código para deixá-lo de acordo com os padrões de boas práticas
 
-3 - Remover informações sensíveis do código-fonte
+<s>3 - Remover informações sensíveis do código-fonte</s>
+
+3 - Criar tela para implementar configurações de e-mail caso não exista arquivo .ini
 
 4 - Tornar as telas mais intuitivas
 
